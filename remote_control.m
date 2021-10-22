@@ -1,17 +1,21 @@
 clear
-myev3 = legoev3('Bluetooth','/dev/tty.GP-SerialPort')
-l = motor(myev3, 'A');
-r = motor(myev3, 'D');
-c = motor(myev3, 'B');
-start(l)
-start(r)
-start(c)
+% myev3 = legoev3('Bluetooth','/dev/tty.GP-SerialPort')
+myev3 = legoev3('USB')
+left = motor(myev3, 'A');
+right = motor(myev3, 'D');
+claw = motor(myev3, 'B');
+gyro = gyroSensor(myev3, 3);
+start(left)
+start(right)
+start(claw)
+
+gyro.resetRotationAngle();
 
 h_fig = figure;
-set(h_fig,'KeyPressFcn',{@keyUpHandler, r, l, c});
-set(h_fig,'KeyReleaseFcn',{@keyReleaseHandler, r, l, c});
+set(h_fig,'KeyPressFcn',{@keyUpHandler, right, left, claw, gyro});
+set(h_fig,'KeyReleaseFcn',{@keyReleaseHandler, right, left, claw});
 
-function keyUpHandler(~,event, right, left, claw)
+function keyUpHandler(~,event, right, left, claw, gyro)
    key = event.Key;
    switch key
     case 'w'
@@ -30,8 +34,12 @@ function keyUpHandler(~,event, right, left, claw)
         claw.Speed = -50;
     case 'e'
         claw.Speed = 50;
-    otherwise
-        quit()    
+    case 'g'
+        gyro.resetRotationAngle();
+    case 'r'
+        self_correction(right, left, gyro, "r");   
+    case 'l'
+        self_correction(right, left, gyro, "l");      
    end
 end
 
