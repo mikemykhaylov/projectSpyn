@@ -1,6 +1,6 @@
 function [] = smart_rotation(right, left, gyro, direction)
 %SELF_CORRECTION Fool-proof rotation algorithm
-speed = 27;
+speed = 26;
 currentRot = gyro.readRotationAngle;
 angle = 0;
 if direction == "r"
@@ -14,8 +14,6 @@ else
         angle = angle - 90;
     end
 end
-disp(currentRot)
-disp(angle)
 targetRot = currentRot + angle;
 while abs(targetRot - currentRot) ~= 0
     currentRot = gyro.readRotationAngle();
@@ -25,7 +23,7 @@ while abs(targetRot - currentRot) ~= 0
     else
         left.Speed = speed;
         right.Speed = -speed;
-    end     
+    end
 end
 left.Speed = 0;
 right.Speed = 0;

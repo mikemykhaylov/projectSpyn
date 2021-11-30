@@ -1,32 +1,54 @@
 function [] = wall_follower(right, left, sonic, touch, color, gyro, stop_color)
 %FOLLOW_WALL Implements right wall follower algorithm
 %   Detailed explanation goes here
-speed = 55;
-right.Speed = speed;
-left.Speed = speed + 3;
+rSpeed = 55;
+lSpeed = rSpeed + 3;
+right.Speed = rSpeed;
+left.Speed = lSpeed;
 while 1
-    initial_dist = sonic.readDistance();
     current_dist = sonic.readDistance();
+    if current_dist < 0.40
+        disp("Need to get closer to wall, currently at distance " + current_dist)
+        wall_closing(right, left, sonic, gyro)
+    end
+    right.Speed = rSpeed;
+    left.Speed = lSpeed;
     dead_end = 0;
-    while abs(current_dist - initial_dist) < 0.1
+    while 1
         current_dist = sonic.readDistance();
-        disp(current_dist)
         current_color = color.readColor();
+        if strcmp(current_color,"red")
+            right.Speed = 0;
+            left.Speed = 0;
+            pause(2)
+            right.Speed = rSpeed;
+            left.Speed = lSpeed;
+            pause(1)
+        end
         if strcmp(current_color,stop_color)
-            return
+            true = 1;
+            for a = 0:5
+                current_color = color.readColor();
+                if ~strcmp(current_color,stop_color)
+                    true = 0;
+                end
+            end
+            if true
+                return
+            end
         end
         if touch.readTouch()
             dead_end = 1;
             break
         end
+        if current_dist > 0.2
+            break
+        end
     end
-    
     if dead_end
-        right.Speed = -speed;
-        left.Speed = -speed - 3;
-        pause(0.7)
+        go_with_red_detection(right, left ,color, 0.3, -rSpeed, -lSpeed)
     else
-        pause(1)
+        go_with_red_detection(right, left ,color, 0.5, rSpeed, lSpeed)
     end
     right.Speed = 0;
     left.Speed = 0;
@@ -35,9 +57,7 @@ while 1
     else
         smart_rotation(right, left, gyro, "r");
     end
-    right.Speed = speed;
-    left.Speed = speed + 3;
-    pause(1)
+    go_with_red_detection(right, left ,color, 1.5, rSpeed, lSpeed)
 end
 end
 

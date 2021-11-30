@@ -3,8 +3,6 @@ speed = 50;
 h_fig = figure;
 set(h_fig,'KeyPressFcn',{@keyUpHandler, right, left, claw, gyro, speed});
 set(h_fig,'KeyReleaseFcn',{@keyReleaseHandler, right, left, claw});
-pause(15)
-close(h_fig)
 end
 
 function keyUpHandler(~,event, right, left, claw, gyro, speed)
@@ -29,9 +27,9 @@ switch key
     case 'g'
         gyro.resetRotationAngle();
     case 'r'
-        self_correction(right, left, gyro, "r");
+        smart_rotation(right, left, gyro, "r");
     case 'l'
-        self_correction(right, left, gyro, "l");
+        smart_rotation(right, left, gyro, "l");
     otherwise
         return
 end
